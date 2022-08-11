@@ -2,13 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
 	url2 "net/url"
 	"os"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
 )
+
+const maxPartitionSize = 50 * 1024
 
 func ExampleScrape() {
 	docv4 := getDoc("https://www.countryipblocks.net/acl.php")
@@ -19,13 +22,13 @@ func ExampleScrape() {
 	save(ipv6, "ipv6")
 }
 
-func collectCIDRs(doc *goquery.Document) string {
+func collectCIDRs(doc *goquery.Document) []string {
 	text := doc.Find("#textareaAll").Text()
 	cidrs := strings.Split(text, "\n")
 	for i, cidr := range cidrs {
 		cidrs[i] = strings.TrimSpace(cidr)
 	}
-	return strings.Join(cidrs, "\n")
+	return cidrs
 }
 
 func getDoc(url string) *goquery.Document {
@@ -53,15 +56,47 @@ func getDoc(url string) *goquery.Document {
 	return doc
 }
 
-func save(cidrs string, fileName string) {
-	f, err := os.Create(fileName)
+func save(cidrs []string, indexName string) {
+	indexFile, err := os.Create(indexName)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
-	_, err = fmt.Fprintln(f, cidrs)
+	var partitionIndex int
+	var partitionSize int
+	defer indexFile.Close()
+	partitionName := fmt.Sprintf("%s_partition%d", indexName, partitionIndex)
+	partitionFile, err := os.Create(partitionName)
 	if err != nil {
 		log.Fatal(err)
+	}
+	for _, cidr := range cidrs {
+		if partitionSize > maxPartitionSize {
+			partitionIndex++
+			partitionSize = 0
+			_, err = fmt.Fprintln(indexFile, partitionName)
+			if err != nil {
+				log.Fatal(err)
+			}
+			partitionFile.Close()
+			partitionName = fmt.Sprintf("%s_partition%d", indexName, partitionIndex)
+			partitionFile, err = os.Create(partitionName)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		line := cidr + "\n"
+		partitionSize += len(line)
+		_, err = fmt.Fprint(partitionFile, line)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	if partitionSize > 0 {
+		_, err = fmt.Fprintln(indexFile, partitionName)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
