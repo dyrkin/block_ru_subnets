@@ -3,43 +3,83 @@
     /ipv6 firewall address-list remove [/ipv6 firewall address-list find list="ru"]
     :local ipv4 [/tool fetch url=https://raw.githubusercontent.com/dyrkin/ru_subnets/main/ipv4 as-value output=user];
     :if ($ipv4->"status" = "finished") do={
-        :local content ($ipv4->"data");
-        :local contentLen [:len $content];
+        :local index ($ipv4->"data");
+        :local indexLen [:len $index];
         :local lineEnd 0;
-        :local line "";
+        :local parititonName "";
         :local lastEnd 0;
 
-        :while ($lineEnd < $contentLen) do={
-            :set lineEnd [:find $content "\n" $lastEnd];
+        :while ($lineEnd < $indexLen) do={
+            :set lineEnd [:find $index "\n" $lastEnd];
             :if ([:len $lineEnd] = 0) do={
-                :set lineEnd $contentLen;
+                :set lineEnd $indexLen;
             }
-            :set line [:pick $content $lastEnd $lineEnd];
+            :set parititonName [:pick $index $lastEnd $lineEnd];
             :set lastEnd ($lineEnd + 1);
-            :local lineLen [:len $line];
-            :if ($lineLen != 0) do={
-                /ip firewall address-list add list=ru address=$line
+            :local parititonNameLen [:len $parititonName];
+            :if ($parititonNameLen != 0) do={
+                :local ipv4 [/tool fetch url="https://raw.githubusercontent.com/dyrkin/ru_subnets/main/$parititonName" as-value output=user];
+                :if ($ipv4->"status" = "finished") do={
+                    :local partition ($ipv4->"data");
+                    :local partitionLen [:len $partition];
+                    :local lineEndInner 0;
+                    :local cidr "";
+                    :local lastEndInner 0;
+
+                    :while ($lineEndInner < $partitionLen) do={
+                        :set lineEndInner [:find $partition "\n" $lastEndInner];
+                        :if ([:len $lineEndInner] = 0) do={
+                            :set lineEndInner $partitionLen;
+                        }
+                        :set cidr [:pick $partition $lastEndInner $lineEndInner];
+                        :set lastEndInner ($lineEndInner + 1);
+                        :local cidrLen [:len $cidr];
+                        :if ($cidrLen != 0) do={
+                            /ip firewall address-list add list=ru address=$cidr
+                        }
+                    }
+                }
             }
         }
     }
-    :local ipv6 [/tool fetch url=https://raw.githubusercontent.com/dyrkin/ru_subnets/main/ipv6 as-value output=user];
+     :local ipv6 [/tool fetch url=https://raw.githubusercontent.com/dyrkin/ru_subnets/main/ipv6 as-value output=user];
     :if ($ipv6->"status" = "finished") do={
-        :local content ($ipv6->"data");
-        :local contentLen [:len $content];
+        :local index ($ipv6->"data");
+        :local indexLen [:len $index];
         :local lineEnd 0;
-        :local line "";
+        :local parititonName "";
         :local lastEnd 0;
 
-        :while ($lineEnd < $contentLen) do={
-            :set lineEnd [:find $content "\n" $lastEnd];
+        :while ($lineEnd < $indexLen) do={
+            :set lineEnd [:find $index "\n" $lastEnd];
             :if ([:len $lineEnd] = 0) do={
-                :set lineEnd $contentLen;
+                :set lineEnd $indexLen;
             }
-            :set line [:pick $content $lastEnd $lineEnd];
+            :set parititonName [:pick $index $lastEnd $lineEnd];
             :set lastEnd ($lineEnd + 1);
-            :local lineLen [:len $line];
-            :if ($lineLen != 0) do={
-                /ipv6 firewall address-list add list=ru address=$line
+            :local parititonNameLen [:len $parititonName];
+            :if ($parititonNameLen != 0) do={
+                :local ipv6 [/tool fetch url="https://raw.githubusercontent.com/dyrkin/ru_subnets/main/$parititonName" as-value output=user];
+                :if ($ipv6->"status" = "finished") do={
+                    :local partition ($ipv6->"data");
+                    :local partitionLen [:len $partition];
+                    :local lineEndInner 0;
+                    :local cidr "";
+                    :local lastEndInner 0;
+
+                    :while ($lineEndInner < $partitionLen) do={
+                        :set lineEndInner [:find $partition "\n" $lastEndInner];
+                        :if ([:len $lineEndInner] = 0) do={
+                            :set lineEndInner $partitionLen;
+                        }
+                        :set cidr [:pick $partition $lastEndInner $lineEndInner];
+                        :set lastEndInner ($lineEndInner + 1);
+                        :local cidrLen [:len $cidr];
+                        :if ($cidrLen != 0) do={
+                            /ipv6 firewall address-list add list=ru address=$cidr
+                        }
+                    }
+                }
             }
         }
     }

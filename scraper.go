@@ -13,7 +13,7 @@ import (
 
 const maxPartitionSize = 50 * 1024
 
-func ExampleScrape() {
+func scrape() {
 	docv4 := getDoc("https://www.countryipblocks.net/acl.php")
 	ipv4 := collectCIDRs(docv4)
 	docv6 := getDoc("https://www.countryipblocks.net/ipv6_acl.php")
@@ -97,9 +97,10 @@ func save(cidrs []string, indexName string) {
 		if err != nil {
 			log.Fatal(err)
 		}
+		partitionFile.Close()
 	}
 }
 
 func main() {
-	ExampleScrape()
+	scrape()
 }
