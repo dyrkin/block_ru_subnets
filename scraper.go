@@ -20,7 +20,12 @@ func ExampleScrape() {
 }
 
 func collectCIDRs(doc *goquery.Document) string {
-	return doc.Find("#textareaAll").Text()
+	text := doc.Find("#textareaAll").Text()
+	cidrs := strings.Split(text, "\n")
+	for i, cidr := range cidrs {
+		cidrs[i] = strings.TrimSpace(cidr)
+	}
+	return strings.Join(cidrs, "\n")
 }
 
 func getDoc(url string) *goquery.Document {
