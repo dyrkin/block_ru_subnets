@@ -83,4 +83,11 @@
             }
         }
     }
+
+    /ip firewall filter remove [find comment="ru_subnets"]
+    /ipv6 firewall filter remove [find comment="ru_subnets"]
+    /ip firewall filter add action=drop chain=input src-address-list=ru comment="ru_subnets"
+    /ip firewall filter add action=drop chain=forward dst-address-list=ru comment="ru_subnets"
+    /ipv6 firewall filter add action=drop chain=input src-address-list=ru comment="ru_subnets"
+    /ipv6 firewall filter add action=drop chain=forward dst-address-list=ru comment="ru_subnets"
 }
