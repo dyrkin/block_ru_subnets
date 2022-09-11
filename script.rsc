@@ -1,7 +1,7 @@
 {
     /ip firewall address-list remove [/ip firewall address-list find list="ru"]
     /ipv6 firewall address-list remove [/ipv6 firewall address-list find list="ru"]
-    :local ipv4 [/tool fetch url=https://raw.githubusercontent.com/dyrkin/ru_subnets/main/ipv4 as-value output=user];
+    :local ipv4 [/tool fetch url=https://raw.githubusercontent.com/dyrkin/block_ru_subnets/main/ipv4 as-value output=user];
     :if ($ipv4->"status" = "finished") do={
         :local index ($ipv4->"data");
         :local indexLen [:len $index];
@@ -18,7 +18,7 @@
             :set lastEnd ($lineEnd + 1);
             :local parititonNameLen [:len $parititonName];
             :if ($parititonNameLen != 0) do={
-                :local ipv4 [/tool fetch url="https://raw.githubusercontent.com/dyrkin/ru_subnets/main/$parititonName" as-value output=user];
+                :local ipv4 [/tool fetch url="https://raw.githubusercontent.com/dyrkin/block_ru_subnets/main/$parititonName" as-value output=user];
                 :if ($ipv4->"status" = "finished") do={
                     :local partition ($ipv4->"data");
                     :local partitionLen [:len $partition];
@@ -42,7 +42,7 @@
             }
         }
     }
-     :local ipv6 [/tool fetch url=https://raw.githubusercontent.com/dyrkin/ru_subnets/main/ipv6 as-value output=user];
+     :local ipv6 [/tool fetch url=https://raw.githubusercontent.com/dyrkin/block_ru_subnets/main/ipv6 as-value output=user];
     :if ($ipv6->"status" = "finished") do={
         :local index ($ipv6->"data");
         :local indexLen [:len $index];
@@ -59,7 +59,7 @@
             :set lastEnd ($lineEnd + 1);
             :local parititonNameLen [:len $parititonName];
             :if ($parititonNameLen != 0) do={
-                :local ipv6 [/tool fetch url="https://raw.githubusercontent.com/dyrkin/ru_subnets/main/$parititonName" as-value output=user];
+                :local ipv6 [/tool fetch url="https://raw.githubusercontent.com/dyrkin/block_ru_subnets/main/$parititonName" as-value output=user];
                 :if ($ipv6->"status" = "finished") do={
                     :local partition ($ipv6->"data");
                     :local partitionLen [:len $partition];
